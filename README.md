@@ -96,28 +96,9 @@ Out-of-sample:
 
 ---
 
-## 4) Repo Structure (suggested)
+## 4) Repo Structure (WIP)
 
-Update these names to match your repo:
-
-```
-.
-├── data/
-│   ├── raw/                # raw price / volume data (not committed if large/private)
-│   └── processed/          # processed DC events / features
-├── src/
-│   ├── dc/                 # directional change extraction utilities
-│   ├── env/                # gym environment (event-based trading env)
-│   ├── features/           # feature engineering
-│   ├── train/              # PPO training scripts
-│   └── eval/               # evaluation + plotting
-├── notebooks/              # exploratory work
-├── results/                # charts, metrics, model comparisons
-├── requirements.txt
-└── README.md
-```
-
----
+To be updated
 
 ## 5) Quickstart (WIP)
 

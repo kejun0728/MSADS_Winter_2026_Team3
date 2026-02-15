@@ -6,7 +6,7 @@ This repository contains my capstone project on **reinforcement learning (PPO)**
 
 ## 1) Project Summary
 
-**Core idea:** Replace fixed-interval bars as the primary “clock” with **Directional Change events**. DC detects meaningful price moves (e.g., 0.25% threshold), then characterizes subsequent overshoot behavior and asymmetry (up vs down). The RL agent uses these event-driven features (plus short-horizon bar features) to choose actions: **LONG / HOLD (not invole) / SHORT**.
+**Core idea:** Replace fixed-interval bars as the primary “clock” with **Directional Change events**. DC detects meaningful price moves (e.g., 0.25% threshold), then characterizes subsequent overshoot behavior and asymmetry (up vs down). The RL agent uses these event-driven features (plus short-horizon bar features) to choose actions: **LONG / HOLD (not involve) / SHORT**.
 
 **What’s implemented so far**
 - Directional Change event generation (confirmation vs detection concepts, overshoot, asymmetry)

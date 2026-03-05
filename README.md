@@ -4,27 +4,57 @@ This repository contains my capstone project on **reinforcement learning (PPO)**
 
 ---
 
+## Project at a glance
+- Asset: BTCUSD (minute bars)
+- Event clock: Directional Change (DC), θ = 0.25%
+- Decision points: at DC confirmations (`t_confirm`)
+- Actions: LONG / HOLD / SHORT (discrete)
+- Execution: optional action lag (tested 2 minutes)
+- Training: one-time split + walk-forward rolling split with warm-start + VecNormalize carry/decay
+
+---
+
 ## 1) Project Summary
 
-**Core idea:** Replace fixed-interval bars as the primary “clock” with **Directional Change events**. DC detects meaningful price moves (e.g., 0.25% threshold), then characterizes subsequent overshoot behavior and asymmetry (up vs down). The RL agent uses these event-driven features (plus short-horizon bar features) to choose actions: **LONG / HOLD (not involve) / SHORT**.
+**Core idea:** Replace fixed-interval bars as the primary “clock” with **Directional Change events**. DC detects meaningful price moves (e.g., 0.25% threshold), then characterizes subsequent overshoot behavior and asymmetry (up vs down). The RL agent uses these event-driven features (plus short-horizon market features) to choose actions: **LONG / HOLD / SHORT**.
 
 **What’s implemented so far**
 - Directional Change event generation (confirmation vs detection concepts, overshoot, asymmetry)
-- PPO agent with configurable state features (hourly baseline → enhanced with minute-level signals)
+- PPO agent with configurable state features (hourly baseline → enhanced with multi-horizon features)
 - Trading environment with:
   - discrete action space (LONG / HOLD / SHORT)
   - **$1 initial equity**, no additional capital injections
   - configurable **decision/action lag** (tested 2 minutes)
 - Evaluation experiments:
   - one-time train/test split
-  - walk-forward high-frequency split (tested training 30–120 days; found ~90 days works best)
+  - walk-forward high-frequency split (rolling windows with warm-start options)
   - robustness tests by varying train/test split and evaluation windows
 
 ---
 
-## 2) Methodology
+## 2) Data & preprocessing (high level)
+- Input: BTCUSD minute OHLC + tick volume proxy (+ spread when available), stored as parquet
+- Cleaning: timestamp parsing, numeric coercion, sorting, duplicate checks
+- Quality checks: missing-minute detection and gap summaries
+- Resampling views (for diagnostics/features): 1h and 1d OHLCV aggregates
 
-### 2.1 Directional Change (DC) sampling
+> Note: the dataset is not included in this repo. See the expected schema below.
+
+### Expected input schema
+Required columns:
+- `timestamp` (datetime)
+- `open`, `high`, `low`, `close` (float)
+- `tick_volume` (float or int)
+
+Optional columns:
+- `spread` (float)
+- `volume` (float or int)
+
+---
+
+## 3) Methodology
+
+### 3.1 Directional Change (DC) sampling
 - **Threshold:** 0.25% (0.0025) directional change
 - Focus:
   - asymmetric behavior in **up vs down** moves
@@ -33,7 +63,7 @@ This repository contains my capstone project on **reinforcement learning (PPO)**
   - information richness
   - feature dimensionality / model stability
 
-### 2.2 PPO Agent Design
+### 3.2 PPO Agent Design
 
 #### State (observations)
 Iteration history:
@@ -71,13 +101,13 @@ Planned extensions:
 
 #### Training approach
 - One-time train/test split
-- Walk-forward split (HFT-style):
-  - tested training windows 30–120 days
-  - ~90-day training window performed best in experiments
+- Walk-forward split (HFT-style rolling windows):
+  - train/validation/test windows rolled forward by a rebalance interval
+  - warm-start + normalization carry/decay options for stability
 
 ---
 
-## 3) Evaluation Notes
+## 4) Evaluation Notes
 
 What was tested:
 - risk-aware evaluation vs raw returns
@@ -96,14 +126,20 @@ Out-of-sample:
 
 ---
 
-## 4) Repo Structure (WIP)
+## 5) Repo Structure (WIP)
+- `notebooks/` — EDA, DC feature engineering, PPO training experiments
+- `results/` — exported plots, metrics tables, model checkpoints (if saved)
+- `src/` — (planned) reusable modules for DC extraction, env, training, evaluation
 
-To be updated
+---
 
-## 5) Quickstart (WIP)
+## 6) Quickstart (WIP)
 
-This section will document the exact commands needed to reproduce results end-to-end:
+Notebook execution order (current workflow):
+1. `BitcoinRL_btc_eda_jim.ipynb` — data cleaning + diagnostics
+2. `test_agent_v20HFT-4-4-4.ipynb` — DC features + PPO training + walk-forward evaluation
 
+Planned CLI workflow (to be added):
 - Environment setup (`pip install -r requirements.txt`)
 - Data preparation (raw data → DC events/features)
 - PPO training (train/eval splits, hyperparameters)
@@ -111,14 +147,23 @@ This section will document the exact commands needed to reproduce results end-to
 
 ---
 
-## 6) Experiments & Key Configs
+## 7) Results snapshot (preliminary)
+- Performance is highly sensitive to train/test splits and volatility regimes.
+- Execution lag (2 minutes) materially impacts realized performance.
+- Action balance remains a challenge (policy can collapse toward dominant LONG/SHORT without gating).
 
-### 6.1 Determinism / reproducibility
+> Plots/metrics will be added in `results/` (equity curves, action distribution, reward diagnostics).
+
+---
+
+## 8) Experiments & Key Configs
+
+### 8.1 Determinism / reproducibility
 - Random seed: `SEED = 2026` (Python, NumPy, Torch)
 - Torch deterministic settings enabled (`cudnn.deterministic=True`, `cudnn.benchmark=False`)
 - Device: CPU (`WF_DEVICE = "cpu"`)
 
-### 6.2 Walk-forward training protocol (HFT-style)
+### 8.2 Walk-forward training protocol (HFT-style)
 - Source split: `WF_SOURCE_SPLIT = "test"` (train/val formed from earlier history; test executed on the selected split)
 - Windowing:
   - `WF_STYLE = "rolling"`
@@ -135,7 +180,7 @@ This section will document the exact commands needed to reproduce results end-to
   - Stop if no improvement for `WF_PATIENCE_EVALS = 5` evals (after `WF_MIN_EVALS = 3`)
   - `WF_N_VAL_EPISODES = 5`
 
-### 6.3 PPO hyperparameters
+### 8.3 PPO hyperparameters
 - Policy: `MlpPolicy`
 - Network: `WF_NET_ARCH = [256, 256]`
 - Learning rate: `WF_LR = 1e-4`
@@ -153,7 +198,7 @@ This section will document the exact commands needed to reproduce results end-to
   - `ent_coef` set as a float at init (`ENT_COEF_START = 0.001`)
   - Entropy schedule endpoints defined (`ENT_COEF_END = 0.0001`) and applied via callback in the training loop
 
-### 6.4 Normalization (VecNormalize)
+### 8.4 Normalization (VecNormalize)
 - Observation normalization enabled: `norm_obs=True`
 - Reward normalization disabled: `norm_reward=False`
 - Observation clipping: `clip_obs=10.0`
@@ -163,14 +208,14 @@ This section will document the exact commands needed to reproduce results end-to
   - Blend carried stats toward current fold distribution: `WF_CARRY_VECNORM_DECAY_TO_FOLD = True`
   - Sync train→val normalization stats during training via a custom callback
 
-### 6.5 Warm-starting across folds
+### 8.5 Warm-starting across folds
 - Warm-start enabled: `WF_WARM_START = True` (source: `WF_WARM_START_SOURCE = "selected"`)
 - Conditional warm-start rules enabled:
   - require prior fold excess PnL above `WF_WARM_START_MIN_PREV_EXCESS_PNL = -0.01`
   - require gated-short fraction below `WF_WARM_START_MAX_PREV_GATED_SHORT_FRAC = 0.70`
 - `WF_RESET_NUM_TIMESTEPS_ON_WARM_START = False` (keeps training timestep continuity unless cold-start)
 
-### 6.6 Action gating / constraints (current defaults)
+### 8.6 Action gating / constraints (current defaults)
 - Gates are implemented but currently off by default in this notebook:
   - `USE_LONG_BIAS_GATE = False`
   - `USE_CONFIDENCE_HOLD_GATE = False`
@@ -178,7 +223,21 @@ This section will document the exact commands needed to reproduce results end-to
 
 ---
 
-## 7) Roadmap (Next Steps)
+## 9) Baselines (WIP)
+- Long-only (buy-and-hold) over the same test window
+- (Planned) simple trend baseline (e.g., moving-average crossover)
+- (Planned) random / always-hold policy sanity check
+
+---
+
+## 10) Assumptions & limitations
+- Discrete actions only (no partial sizing yet).
+- Costs/slippage are simplified unless explicitly enabled in reward/eval.
+- Regime shifts (volatility spikes) can dominate short validation/test windows in walk-forward splits.
+
+---
+
+## 11) Roadmap (Next Steps)
 
 Highest-priority improvements:
 1. **Action balance**: reduce collapse into dominant LONG/SHORT (improve regularization + reward shaping)
@@ -192,7 +251,7 @@ Highest-priority improvements:
 
 ---
 
-## 8) Reproducibility
+## 12) Reproducibility
 
 To ensure comparable results:
 - fix random seeds (numpy / torch / stable-baselines3)
@@ -205,6 +264,6 @@ To ensure comparable results:
 
 ---
 
-## 9) Disclaimer
+## 13) Disclaimer
 
 This project is for educational research purposes only and is **not financial advice**. Backtests are sensitive to assumptions (slippage, costs, data quality, regime shifts).

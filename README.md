@@ -144,19 +144,37 @@ Out-of-sample:
 
 ## 6) Quickstart (current notebook workflow)
 
-Notebook execution order (current workflow):
-1. `BitcoinRL_btc_eda_jim.ipynb` — data cleaning + diagnostics
-2. `test_agent_v20HFT-4-4-4.ipynb` — DC features + PPO training + walk-forward evaluation
+### 6.1 Install dependencies
 
-Planned CLI workflow (to be added):
-- Environment setup (`pip install -r requirements.txt`)
-- Data preparation (raw data → DC events/features)
-- PPO training (train/eval splits, hyperparameters)
-- Evaluation/backtest (including execution lag)
+**If using pip:**
+```bash
+pip install -r notebooks/requirements.txt
+```
+**If using Vertex AI / conda:**
+```bash
+conda env create -f notebooks/environment.yml
+conda activate <env_name>
+```
+
+### 6.2 Prepare data
+This repo includes sample-period parquet files under `data/`:
+- `data/df_min_from_2025-07-16.parquet`
+- `data/DC_events_1min_from_2025-07-16.parquet`
+If you are using a different period or raw dataset, place your raw minute bars locally and regenerate the processed files via the notebooks below.
+
+### 6.3 Run notebooks in order
+- `notebooks/BitcoinRL_btc_eda.ipynb` — data cleaning + missing-minute diagnostics
+  - output: `data/df_min_from_2025-07-16.parquet`
+- `notebooks/dc_processing.ipynb` + `notebooks/dc_sampling.py` — DC event construction + feature prep
+  - output: `data/DC_events_1min_from_2025-07-16.parquet`
+
+Choose a training mode:
+- `notebooks/test_agent_one_time_train.ipynb` — PPO one-time train/test split
+- `notebooks/test_agent_wf.ipynb` — PPO walk-forward (rolling) training + evaluation
 
 ---
 
-## 7) Results snapshot 
+## 7) Results 
 - Performance is highly sensitive to train/test splits and volatility regimes.
 - Execution lag (2 minutes) materially impacts realized performance.
 - Action balance remains a challenge (policy can collapse toward dominant LONG/SHORT without gating).
@@ -246,7 +264,6 @@ See **`slides/BTC RL Trading Agent Presentation - Draft.pptx`** for detailed fig
 ---
 
 ## 11) Roadmap (Next Steps)
-
 Highest-priority improvements:
 1. **Action balance**: reduce collapse into dominant LONG/SHORT (improve regularization + reward shaping)
 2. **Transaction costs + short costs**: make results more realistic

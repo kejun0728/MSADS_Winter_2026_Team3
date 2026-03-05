@@ -152,7 +152,7 @@ Planned CLI workflow (to be added):
 - Execution lag (2 minutes) materially impacts realized performance.
 - Action balance remains a challenge (policy can collapse toward dominant LONG/SHORT without gating).
 
-> Plots/metrics will be added in `results/` (equity curves, action distribution, reward diagnostics).
+See **`slides/BTC RL Trading Agent Presentation - Draft.pptx`** for detailed figures and tables.
 
 ---
 

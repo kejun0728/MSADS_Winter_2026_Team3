@@ -126,14 +126,23 @@ Out-of-sample:
 
 ---
 
-## 5) Repo Structure (WIP)
-- `notebooks/` — EDA, DC feature engineering, PPO training experiments
-- `results/` — exported plots, metrics tables, model checkpoints (if saved)
-- `src/` — (planned) reusable modules for DC extraction, env, training, evaluation
+## 5) Repo Structure 
+- `notebooks/`
+  - `BitcoinRL_btc_eda.ipynb` — data cleaning + missing-minute diagnostics (minute bars)
+  - `dc_processing.ipynb` — feature preprocessing utilities for DC/RL workflow
+  - `dc_sampling.py` — directional-change (DC) event extraction logic
+  - `test_agent_one_time_train.ipynb` — PPO training + evaluation using one-time train/test split
+  - `test_agent_wf.ipynb` — PPO walk-forward (rolling) training + evaluation
+  - `requirements.txt` — pip dependencies (current environment)
+  - `environment.yml` — conda environment export (Vertex AI)
+
+- `data/`
+  - `df_min_from_2025-07-16.parquet` — cleaned BTC minute dataset (sample period)
+  - `DC_events_1min_from_2025-07-16.parquet` — generated DC events (sample period)
 
 ---
 
-## 6) Quickstart (WIP)
+## 6) Quickstart (current notebook workflow)
 
 Notebook execution order (current workflow):
 1. `BitcoinRL_btc_eda_jim.ipynb` — data cleaning + diagnostics
@@ -147,7 +156,7 @@ Planned CLI workflow (to be added):
 
 ---
 
-## 7) Results snapshot (preliminary)
+## 7) Results snapshot 
 - Performance is highly sensitive to train/test splits and volatility regimes.
 - Execution lag (2 minutes) materially impacts realized performance.
 - Action balance remains a challenge (policy can collapse toward dominant LONG/SHORT without gating).
@@ -215,18 +224,17 @@ See **`slides/BTC RL Trading Agent Presentation - Draft.pptx`** for detailed fig
   - require gated-short fraction below `WF_WARM_START_MAX_PREV_GATED_SHORT_FRAC = 0.70`
 - `WF_RESET_NUM_TIMESTEPS_ON_WARM_START = False` (keeps training timestep continuity unless cold-start)
 
-### 8.6 Action gating / constraints (current defaults)
-- Gates are implemented but currently off by default in this notebook:
+### 8.6 Action gating / constraints 
+- Gates can be modified in the notebook:
   - `USE_LONG_BIAS_GATE = False`
   - `USE_CONFIDENCE_HOLD_GATE = False`
   - `USE_SHORT_CONFIDENCE_GATE = False`
 
 ---
 
-## 9) Baselines (WIP)
+## 9) Baselines 
 - Long-only (buy-and-hold) over the same test window
-- (Planned) simple trend baseline (e.g., moving-average crossover)
-- (Planned) random / always-hold policy sanity check
+- (Planned) Execution following directional change signal
 
 ---
 

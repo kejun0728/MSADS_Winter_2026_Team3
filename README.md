@@ -27,11 +27,12 @@ Our project design is guided by several themes from recent RL trading literature
 - **Robustness / overfitting control.** Deep RL agents can overfit backtests; recommended practices include time-based validation (walk-forward testing), explicit overfitting detection, and model selection/ensembling across regimes.
 
 ### References
-[1] Sattarov, J., & Choi, J. (2024). *Multi-level deep Q-networks for Bitcoin trading strategies*. **Scientific Reports**. https://www.nature.com/articles/s41598-024-51408-w  
-[2] Liu, et al. (2021). *Bitcoin Transaction Strategy Construction Based on Deep Reinforcement Learning*. arXiv:2109.14789. https://arxiv.org/abs/2109.14789  
-[3] Gort, et al. (2022). *Deep Reinforcement Learning for Cryptocurrency Trading: Practical Approach to Address Backtest Overfitting*. arXiv:2209.05559. https://arxiv.org/abs/2209.05559  
-[4] Wang, & Klabjan. (2023). *An Ensemble Method of Deep Reinforcement Learning for Automated Cryptocurrency Trading*. arXiv:2309.00626. https://arxiv.org/abs/2309.00626  
-[5] Rayment, G. (2025). *PhD Thesis: Spread Aware Deep Reinforcement Learning for Financial Trading (SADRL)*. https://kampouridis.net/papers/PhD_Thesis_Rayment.pdf  
+[1] Kent Academic Repository (KAR): DC / intrinsic time / overshoot: https://kar.kent.ac.uk/id/document/3179919
+[2] Sattarov, J., & Choi, J. (2024). *Multi-level deep Q-networks for Bitcoin trading strategies*. **Scientific Reports**. https://www.nature.com/articles/s41598-024-51408-w  
+[3] Liu, et al. (2021). *Bitcoin Transaction Strategy Construction Based on Deep Reinforcement Learning*. arXiv:2109.14789. https://arxiv.org/abs/2109.14789  
+[4] Gort, et al. (2022). *Deep Reinforcement Learning for Cryptocurrency Trading: Practical Approach to Address Backtest Overfitting*. arXiv:2209.05559. https://arxiv.org/abs/2209.05559  
+[5] Wang, & Klabjan. (2023). *An Ensemble Method of Deep Reinforcement Learning for Automated Cryptocurrency Trading*. arXiv:2309.00626. https://arxiv.org/abs/2309.00626  
+[6] Rayment, G. (2025). *PhD Thesis: Spread Aware Deep Reinforcement Learning for Financial Trading (SADRL)*. https://kampouridis.net/papers/PhD_Thesis_Rayment.pdf  
 
 ## 1) Project Summary
 

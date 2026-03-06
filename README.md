@@ -35,7 +35,7 @@ Our project design is guided by several themes from recent RL trading literature
 
 ## 1) Project Summary
 
-## Research questions
+### Research questions
 1. **Does Directional Change (DC) event-based sampling improve RL trading robustness** versus fixed-interval bars for BTC at minute frequency?
 2. **Can a PPO agent learn a stable long/hold/short policy** that generalizes under walk-forward (deployment-like) evaluation, including realistic execution lag?
 3. **Which design choices matter most** (feature horizons, reward shaping, normalization carry/decay, and action/probability gating) for out-of-sample performance and action balance?

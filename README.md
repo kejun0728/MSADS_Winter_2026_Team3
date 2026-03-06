@@ -13,8 +13,32 @@ This repository contains my capstone project on **reinforcement learning (PPO)**
 - Training: one-time split + walk-forward rolling split with warm-start + VecNormalize carry/decay
 
 ---
+## 0) Background & literature inspiration
+
+### Motivation
+Bitcoin trades 24/7 and exhibits frequent regime shifts and extreme volatility. Unlike traditional assets with clearer fundamentals, crypto price dynamics are often sentiment-driven, making static rule-based strategies hard to maintain across market regimes. Reinforcement learning (RL) offers a framework to learn sequential trading decisions directly from interaction with a market environment, optimizing cumulative (risk-adjusted) performance rather than one-step price forecasts.
+
+### Literature inspiration
+Our project design is guided by several themes from recent RL trading literature:
+
+- **Event-based sampling (Directional Change + overshoot).** Directional Change (DC) represents price action in intrinsic time: a DC event triggers when price moves by a fixed threshold and is followed by an overshoot phase until the next reversal. This filters micro-noise and segments trends into more structurally meaningful regimes.  
+- **Policy-gradient / actor-critic methods for trading.** PPO and related deep RL methods have been successfully applied to trading when combined with careful reward design and validation.  
+- **Sequence-aware policies (LSTM + PPO).** Prior work finds that LSTM architectures can better capture temporal patterns in BTC, and integrating LSTM into PPO improves trading performance in simulation.  
+- **Robustness / overfitting control.** Deep RL agents can overfit backtests; recommended practices include time-based validation (walk-forward testing), explicit overfitting detection, and model selection/ensembling across regimes.
+
+### References
+[1] Sattarov, J., & Choi, J. (2024). *Multi-level deep Q-networks for Bitcoin trading strategies*. **Scientific Reports**. https://www.nature.com/articles/s41598-024-51408-w  
+[2] Liu, et al. (2021). *Bitcoin Transaction Strategy Construction Based on Deep Reinforcement Learning*. arXiv:2109.14789. https://arxiv.org/abs/2109.14789  
+[3] Gort, et al. (2022). *Deep Reinforcement Learning for Cryptocurrency Trading: Practical Approach to Address Backtest Overfitting*. arXiv:2209.05559. https://arxiv.org/abs/2209.05559  
+[4] Wang, & Klabjan. (2023). *An Ensemble Method of Deep Reinforcement Learning for Automated Cryptocurrency Trading*. arXiv:2309.00626. https://arxiv.org/abs/2309.00626  
+[5] Rayment, G. (2025). *PhD Thesis: Spread Aware Deep Reinforcement Learning for Financial Trading (SADRL)*. https://kampouridis.net/papers/PhD_Thesis_Rayment.pdf  
 
 ## 1) Project Summary
+
+## Research questions
+1. **Does Directional Change (DC) event-based sampling improve RL trading robustness** versus fixed-interval bars for BTC at minute frequency?
+2. **Can a PPO agent learn a stable long/hold/short policy** that generalizes under walk-forward (deployment-like) evaluation, including realistic execution lag?
+3. **Which design choices matter most** (feature horizons, reward shaping, normalization carry/decay, and action/probability gating) for out-of-sample performance and action balance?
 
 **Core idea:** Replace fixed-interval bars as the primary “clock” with **Directional Change events**. DC detects meaningful price moves (e.g., 0.25% threshold), then characterizes subsequent overshoot behavior and asymmetry (up vs down). The RL agent uses these event-driven features (plus short-horizon market features) to choose actions: **LONG / HOLD / SHORT**.
 

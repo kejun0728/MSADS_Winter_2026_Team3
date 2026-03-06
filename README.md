@@ -203,7 +203,7 @@ Choose a training mode:
 - Execution lag (2 minutes) materially impacts realized performance.
 - Action balance remains a challenge (policy can collapse toward dominant LONG/SHORT without gating).
 
-See **`slides/BTC RL Trading Agent Presentation - Draft.pptx`** for detailed figures and tables.
+See **`slides/BTC RL Trading Agent Presentation.pptx`** for detailed figures and tables.
 
 ---
 

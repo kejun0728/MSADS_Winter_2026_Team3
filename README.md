@@ -164,6 +164,8 @@ Out-of-sample:
   - `df_min_from_2025-07-16.parquet` — cleaned BTC minute dataset (sample period)
   - `DC_events_1min_from_2025-07-16.parquet` — generated DC events (sample period)
 
+-`results/`
+  - `BTC RL Trading Agent Presentation.pptx`— selective figures and tables of the team's analysis.
 ---
 
 ## 6) Quickstart (current notebook workflow)
@@ -203,7 +205,7 @@ Choose a training mode:
 - Execution lag (2 minutes) materially impacts realized performance.
 - Action balance remains a challenge (policy can collapse toward dominant LONG/SHORT without gating).
 
-See **`slides/BTC RL Trading Agent Presentation.pptx`** for detailed figures and tables.
+See **`results/BTC RL Trading Agent Presentation.pptx`** for detailed figures and tables.
 
 ---
 
